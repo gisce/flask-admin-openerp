@@ -1,4 +1,4 @@
-from flask.ext.admin.form import BaseForm
+from flask.ext.admin.form import BaseForm, widgets
 from wtforms import (
     BooleanField, FloatField, DateField, DateTimeField, StringField,
     TextAreaField, IntegerField, SelectField
@@ -9,8 +9,8 @@ from erppeek import mixedcase
 MAPPING_TYPES = {
     'boolean': BooleanField,
     'float': FloatField,
-    'date': DateField,
-    'datetime': DateTimeField,
+    'date': StringField,
+    'datetime': StringField,
     'char': StringField,
     'text': TextAreaField,
     'int': IntegerField,
@@ -42,5 +42,9 @@ class Form(object):
             kwargs = {}
             if v['type'] == 'selection':
                 kwargs['choices'] = v['selection']
+            elif v['type'] == 'date':
+                kwargs['widget'] = widgets.DatePickerWidget()
+            elif v['type'] == 'datetime':
+                kwargs['widget'] = widgets.DateTimePickerWidget()
             attrs[k] = type_field(label=v['string'], **kwargs)
         return type(class_name, (BaseForm, ), attrs)
