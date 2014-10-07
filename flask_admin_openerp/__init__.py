@@ -1,5 +1,5 @@
 from flask.ext.admin.model import BaseModelView
-from .form import create_form
+from .form import Form
 from .filters import *
 
 
@@ -15,7 +15,8 @@ class OpenERPModelView(BaseModelView):
         return None
 
     def scaffold_form(self):
-        return create_form(self.model)
+        oo_form = Form(self)
+        return oo_form.create_form()
 
     def scaffold_filters(self, name):
         field = self.model.fields_get([name])[name]

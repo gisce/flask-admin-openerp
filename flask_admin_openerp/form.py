@@ -1,4 +1,8 @@
-from wtforms import *
+from flask.ext.admin.form import BaseForm
+from wtforms import (
+    BooleanField, FloatField, DateField, DateTimeField, StringField,
+    TextAreaField, IntegerField, SelectField
+)
 from erppeek import mixedcase
 
 
@@ -14,15 +18,29 @@ MAPPING_TYPES = {
 }
 
 
-def create_form(model, relations=True):
-    class_name = '%sForm' % mixedcase(model._name)
-    attrs = {}
-    for k, v in model.fields_get().items():
-        type_field = MAPPING_TYPES.get(v.get('type', 'float'))
-        if not type_field:
-            continue
-        kwargs = {}
-        if v['type'] == 'selection':
-            kwargs['choices'] = v['selection']
-        attrs[k] = type_field(label=v['string'], **kwargs)
-    return type(class_name, (Form, ), attrs)
+class Form(object):
+
+    def __init__(self, view):
+        self.view = view
+        self.model = view.model
+
+    def _get_form_overrides(self, name):
+        form_overrides = getattr(self.view, 'form_overrides', {})
+        return form_overrides.get(name, None)
+
+    def create_form(self, relations=True):
+        model = self.model
+        class_name = '%sForm' % mixedcase(model._name)
+        attrs = {}
+        for k, v in model.fields_get().items():
+            type_field = MAPPING_TYPES.get(v.get('type', 'float'))
+            if not type_field:
+                continue
+            override = self._get_form_overrides(k)
+            if override:
+                type_field = override
+            kwargs = {}
+            if v['type'] == 'selection':
+                kwargs['choices'] = v['selection']
+            attrs[k] = type_field(label=v['string'], **kwargs)
+        return type(class_name, (BaseForm, ), attrs)
