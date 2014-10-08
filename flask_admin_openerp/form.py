@@ -1,6 +1,6 @@
 from flask.ext.admin.form import BaseForm, widgets
 from wtforms import (
-    BooleanField, FloatField, DateField, DateTimeField, StringField,
+    BooleanField, FloatField, StringField,
     TextAreaField, IntegerField, SelectField
 )
 from erppeek import mixedcase
