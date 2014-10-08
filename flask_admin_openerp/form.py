@@ -42,6 +42,8 @@ class Form(object):
                 type_field = override
             kwargs = {}
             if v['type'] == 'selection':
+                if v['selection'] and isinstance(v['selection'][0][0], int):
+                    kwargs['coerce'] = int
                 kwargs['choices'] = v['selection']
             elif v['type'] == 'date':
                 kwargs['widget'] = widgets.DatePickerWidget()
