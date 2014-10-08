@@ -25,8 +25,9 @@ class Form(object):
         self.model = view.model
 
     def _get_form_overrides(self, name):
-        form_overrides = getattr(self.view, 'form_overrides', {})
-        return form_overrides.get(name, None)
+        form_overrides = getattr(self.view, 'form_overrides')
+        if form_overrides:
+            return form_overrides.get(name, None)
 
     def create_form(self, relations=True):
         model = self.model
