@@ -10,5 +10,5 @@ setup(
     author='GISCE-TI, S.L.',
     author_email='ti@gisce.net',
     install_requires=['flask-admin', 'erppeek'],
-    description=''
+    description='OpenERP Backend for Flask-Admin'
 )
