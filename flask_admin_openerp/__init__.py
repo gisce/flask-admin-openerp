@@ -1,9 +1,37 @@
+import base64
+
+from flask import request, abort
+from flask.ext.admin import expose
 from flask.ext.admin.model import BaseModelView
 from .form import Form
 from .filters import *
 
 
 class OpenERPModelView(BaseModelView):
+
+    @expose('/attachments', methods=['GET', 'POST'])
+    def attachments(self):
+        attach_obj = self.model.client.model('ir.attachment')
+        obj_id = request.args.get('id')
+        if not obj_id:
+            return abort(404)
+        if request.method == 'POST':
+            for key, value in request.files.items():
+                if key.startswith('attachment_'):
+                    content = base64.b64encode(value.read())
+                    if not content:
+                        continue
+                    attach_obj.create({
+                        'name': value.filename,
+                        'datas': content,
+                        'datas_fname': value.filename,
+                        'res_model': self.model._name,
+                        'res_id': obj_id
+                    })
+        elif request.method == 'GET':
+            # Busquem tots els adjunts
+            return "All attachments"
+        return "Oh yeah"
 
     def get_pk_value(self, model):
         return model.id
