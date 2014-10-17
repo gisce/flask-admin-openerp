@@ -86,9 +86,7 @@ class Form(object):
             elif v['type'] in ('many2one', 'one2many'):
                 relation = model.client.model(v['relation'])
                 ids = relation.search([])
-                kwargs['choices'] = [
-                    (x['id'], x['name']) for x in relation.read(ids, ['name'])
-                ]
+                kwargs['choices'] = relation.name_get(ids)
 
                 kwargs['coerce'] = coerce_relation
                 if v['type'] == 'many2one':
