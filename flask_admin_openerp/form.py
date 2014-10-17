@@ -45,7 +45,7 @@ MAPPING_TYPES = {
     'datetime': StringField,
     'char': StringField,
     'text': TextAreaField,
-    'int': IntegerField,
+    'integer': IntegerField,
     'selection': SelectField,
     'many2one': SelectField,
     'one2many': SelectMultipleField
