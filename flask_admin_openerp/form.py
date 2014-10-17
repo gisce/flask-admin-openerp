@@ -1,10 +1,11 @@
 from flask.ext.admin.form import BaseForm, widgets
 from wtforms import (
     BooleanField, FloatField, StringField,
-    TextAreaField, IntegerField, SelectField, SelectMultipleField
+    TextAreaField, IntegerField, SelectField, SelectMultipleField, FileField
 )
 from wtforms import widgets as wtf_widgets
 from erppeek import mixedcase, Record
+import base64
 
 
 def coerce_relation(value):
@@ -36,7 +37,16 @@ class ListWidget(wtf_widgets.Select):
         html.append('</select>')
         return wtf_widgets.HTMLString(''.join(html))
 
+class BinaryField(FileField):
 
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = base64.b64encode(valuelist[0].stream.read())
+        else:
+            self.data = ''
+
+    def _value(self):
+        return base64.b64decode(self.data) if self.data is not None else ''
 
 MAPPING_TYPES = {
     'boolean': BooleanField,
@@ -48,7 +58,8 @@ MAPPING_TYPES = {
     'int': IntegerField,
     'selection': SelectField,
     'many2one': SelectField,
-    'one2many': SelectMultipleField
+    'one2many': SelectMultipleField,
+    'binary': BinaryField
 }
 
 
