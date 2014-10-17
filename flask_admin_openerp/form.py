@@ -57,6 +57,8 @@ class Form(object):
     def __init__(self, view):
         self.view = view
         self.model = view.model
+        self.fields = []
+        self.fields = getattr(view, 'fields', [])
 
     def _get_form_overrides(self, name):
         form_overrides = getattr(self.view, 'form_overrides')
