@@ -1,6 +1,6 @@
 import base64
 
-from flask import request, abort
+from flask import request, abort, redirect, url_for, flash
 from flask.ext.admin import expose
 from flask.ext.admin.model import BaseModelView
 from .form import Form
@@ -16,22 +16,29 @@ class OpenERPModelView(BaseModelView):
         if not obj_id:
             return abort(404)
         if request.method == 'POST':
-            for key, value in request.files.items():
-                if key.startswith('attachment_'):
-                    content = base64.b64encode(value.read())
-                    if not content:
-                        continue
-                    attach_obj.create({
-                        'name': value.filename,
-                        'datas': content,
-                        'datas_fname': value.filename,
-                        'res_model': self.model._name,
-                        'res_id': obj_id
-                    })
-        elif request.method == 'GET':
-            # Busquem tots els adjunts
-            return "All attachments"
-        return "Oh yeah"
+            if request.args.get('action') == "delete":
+                attach_id = request.args.get('attach_id')
+                if not attach_id:
+                    return abort(404)
+                attach_obj.unlink([attach_id])
+                flash("Attachment deleted succesfully", "info")
+            else:
+                created = 0
+                for key, value in request.files.items():
+                    if key.startswith('attachment_'):
+                        content = base64.b64encode(value.read())
+                        if not content:
+                            continue
+                        attach_obj.create({
+                            'name': value.filename,
+                            'datas': content,
+                            'datas_fname': value.filename,
+                            'res_model': self.model._name,
+                            'res_id': obj_id
+                        })
+                        created += 1
+                flash("%s new attachments created" % created, "info")
+        return redirect(url_for('.edit_view', id=obj_id))
 
     def get_pk_value(self, model):
         return model.id
