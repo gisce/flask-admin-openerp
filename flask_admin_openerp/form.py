@@ -25,7 +25,7 @@ class ListWidget(wtf_widgets.Select):
         html = ['<ul %s>' % wtf_widgets.html_params(**kwargs)]
         for subfield in field:
             if subfield.checked:
-                html.append('<li>%s</li>' % subfield.label.text)
+                html.append('<li>%s <a class="icon-trash" href="#" onclick="delete_item(this, %s)"> </a></li>' % (subfield.label.text.strip(), subfield.data))
         html.append('</ul>')
         kwargs.setdefault('id', field.id)
         kwargs['multiple'] = True
@@ -34,6 +34,14 @@ class ListWidget(wtf_widgets.Select):
         for val, label, selected in field.iter_choices():
             html.append(self.render_option(val, label, selected))
         html.append('</select>')
+        html += ['''
+            <script type="text/javascript">
+               function delete_item(elem, val) {
+                    $(elem).parent().css("text-decoration", "line-through");
+                    $("option[value="+val+"]").removeAttr("selected");
+               }
+            </script>
+        ''']
         return wtf_widgets.HTMLString(''.join(html))
 
 
