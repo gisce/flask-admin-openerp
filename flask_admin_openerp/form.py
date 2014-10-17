@@ -15,6 +15,7 @@ MAPPING_TYPES = {
     'text': TextAreaField,
     'int': IntegerField,
     'selection': SelectField,
+    'many2one': SelectField
 }
 
 
@@ -49,5 +50,13 @@ class Form(object):
                 kwargs['widget'] = widgets.DatePickerWidget()
             elif v['type'] == 'datetime':
                 kwargs['widget'] = widgets.DateTimePickerWidget()
+            elif v['type'] == 'many2one':
+                relation = model.client.model(v['relation'])
+                ids = relation.search([])
+                kwargs['choices'] = [
+                    (x['id'], x['name']) for x in relation.read(ids, ['name'])
+                ]
+                kwargs['widget'] = widgets.Select2Widget()
+                kwargs['coerce'] = int
             attrs[k] = type_field(label=v['string'], **kwargs)
         return type(class_name, (BaseForm, ), attrs)
