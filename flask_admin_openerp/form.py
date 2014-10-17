@@ -55,7 +55,7 @@ MAPPING_TYPES = {
     'datetime': StringField,
     'char': StringField,
     'text': TextAreaField,
-    'int': IntegerField,
+    'integer': IntegerField,
     'selection': SelectField,
     'many2one': SelectField,
     'one2many': SelectMultipleField,
@@ -68,6 +68,8 @@ class Form(object):
     def __init__(self, view):
         self.view = view
         self.model = view.model
+        self.fields = []
+        self.fields = getattr(view, 'fields', [])
 
     def _get_form_overrides(self, name):
         form_overrides = getattr(self.view, 'form_overrides')
@@ -78,7 +80,9 @@ class Form(object):
         model = self.model
         class_name = '%sForm' % mixedcase(model._name)
         attrs = {}
-        for k, v in model.fields_get().items():
+        fields = model.fields_get(self.fields)
+        defaults = model.default_get(fields.keys())
+        for k, v in fields.items():
             type_field = MAPPING_TYPES.get(v.get('type', 'float'))
             if not type_field:
                 continue
@@ -86,6 +90,8 @@ class Form(object):
             if override:
                 type_field = override
             kwargs = {}
+            if k in defaults and defaults[k] is not False:
+                kwargs['default'] = defaults[k]
             if v['type'] == 'selection':
                 if v['selection'] and isinstance(v['selection'][0][0], int):
                     kwargs['coerce'] = int
