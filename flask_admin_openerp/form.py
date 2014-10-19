@@ -1,7 +1,8 @@
 from flask.ext.admin.form import BaseForm, widgets
 from wtforms import (
     BooleanField, FloatField, StringField,
-    TextAreaField, IntegerField, SelectField, SelectMultipleField, FileField
+    TextAreaField, IntegerField, SelectField, SelectMultipleField, FileField,
+    PasswordField
 )
 from wtforms import widgets as wtf_widgets
 from erppeek import mixedcase, Record
@@ -104,6 +105,8 @@ class Form(object):
                 if v['selection'] and isinstance(v['selection'][0][0], int):
                     kwargs['coerce'] = int
                 kwargs['choices'] = v['selection']
+            elif v['type'] == 'char' and 'invisible' in v and v['invisible']:
+                type_field = PasswordField
             elif v['type'] == 'date':
                 kwargs['widget'] = widgets.DatePickerWidget()
             elif v['type'] == 'datetime':
