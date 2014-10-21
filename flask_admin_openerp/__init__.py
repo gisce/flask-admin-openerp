@@ -78,10 +78,20 @@ class OpenERPModelView(BaseModelView):
         return n_items, res
 
     def create_model(self, form):
-        return self.model.create(form.data)
+        if self.form_edit_rules != None:
+            data_to_write = {key: value for key, value in form.data.items()
+                         if key in self.form_create_rules}
+        else:
+            data_to_write = form.data
+        return self.model.create(data_to_write)
 
     def update_model(self, form, model):
-        return model.write(form.data)
+        if self.form_edit_rules != None:
+            data_to_write = {key: value for key, value in form.data.items()
+                         if key in self.form_edit_rules}
+        else:
+            data_to_write = form.data
+        return model.write(data_to_write)
 
     def delete_model(self, model):
         return model.unlink()
