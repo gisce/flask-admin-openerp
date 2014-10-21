@@ -68,6 +68,7 @@ MAPPING_TYPES = {
     'selection': SelectField,
     'many2one': SelectField,
     'one2many': SelectMultipleField,
+    'many2many': SelectMultipleField,
     'binary': BinaryField
 }
 
@@ -121,6 +122,8 @@ class Form(object):
                     kwargs['widget'] = widgets.Select2Widget()
                 elif v['type'] == 'one2many':
                     kwargs['widget'] = ListWidget()
+                elif v['type'] == 'many2many':
+                    kwargs['widget'] = widgets.Select2Widget(multiple=True)
 
             attrs[k] = type_field(label=v['string'], **kwargs)
         return type(class_name, (BaseForm, ), attrs)
