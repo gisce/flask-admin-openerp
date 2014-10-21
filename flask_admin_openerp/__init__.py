@@ -5,6 +5,24 @@ from .filters import *
 
 class OpenERPModelView(BaseModelView):
 
+    def __init__(self, model, **kwargs):
+        super(OpenERPModelView, self).__init__(model, **kwargs)
+        self.dynamic_choice_fields = {}
+        for field, desc in model.fields_get().items():
+            if 'relation' in desc and desc['relation']:
+                self.dynamic_choice_fields[field] = desc['relation']
+
+    def edit_form(self, obj):
+        """Updates the choices for dynamic fields.
+        """
+        form = super(OpenERPModelView, self).edit_form(obj)
+        for choice_field, relation in self.dynamic_choice_fields.items():
+            relation = self.model.client.model(relation)
+            remote_ids = relation.search([])
+            field = getattr(form, choice_field)
+            field.choices = relation.name_get(remote_ids)
+        return form
+
     def get_pk_value(self, model):
         return model.id
 

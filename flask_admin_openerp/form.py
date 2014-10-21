@@ -113,10 +113,6 @@ class Form(object):
             elif v['type'] == 'datetime':
                 kwargs['widget'] = widgets.DateTimePickerWidget()
             elif v['type'] in ('many2one', 'one2many'):
-                relation = model.client.model(v['relation'])
-                ids = relation.search([])
-                kwargs['choices'] = relation.name_get(ids)
-
                 kwargs['coerce'] = coerce_relation
                 if v['type'] == 'many2one':
                     kwargs['widget'] = widgets.Select2Widget()
