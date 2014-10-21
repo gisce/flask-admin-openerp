@@ -23,6 +23,17 @@ class OpenERPModelView(BaseModelView):
             field.choices = relation.name_get(remote_ids)
         return form
 
+    def create_form(self):
+        """Updates the choices for dynamic fields.
+        """
+        form = super(OpenERPModelView, self).create_form()
+        for choice_field, relation in self.dynamic_choice_fields.items():
+            relation = self.model.client.model(relation)
+            remote_ids = relation.search([])
+            field = getattr(form, choice_field)
+            field.choices = relation.name_get(remote_ids)
+        return form
+
     def get_pk_value(self, model):
         return model.id
 
