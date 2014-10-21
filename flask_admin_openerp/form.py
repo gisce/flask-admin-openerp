@@ -50,7 +50,9 @@ class BinaryField(FileField):
 
     def process_formdata(self, valuelist):
         if valuelist:
-            self.data = base64.b64encode(valuelist[0].stream.read())
+            data = base64.b64encode(valuelist[0].stream.read())
+            if data:
+                self.data = data
         else:
             self.data = ''
 
