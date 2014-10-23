@@ -1,0 +1,50 @@
+{% extends 'admin/model/edit.html' %}
+
+{% block head %}
+        {{ super() }}
+        <script type="text/javascript">
+            var attachs = 0;
+            function addFile() {
+                attachs += 1;
+                $("#attachments_zone").append('<div id="attachment_' + attachs + '"><input type="file" name="attachment_' + attachs + '"/><a href="javascript:removeFile(' + attachs + ')">X</a><br/></div>');
+                if (attachs > 0) {
+                    $("#attach_link").html("Add another attachment");
+                }
+            }
+            function removeFile(id) {
+                $("#attachment_"+ id).remove();
+                attachs -= 1;
+                if (attachs < 1) {
+                    $("#attach_link").html('Add an attachment');
+                }
+            }
+        </script>
+{% endblock %}
+
+{% block body %}
+        {{ super() }}
+        {% if request.args.get('id') %}
+        <h3>Attachments</h3>
+        <form action="{{ url_for('.attachments', id=request.args['id']) }}" method="POST" enctype="multipart/form-data" id="attachments">
+            <a href="javascript:addFile()" id="attach_link">Add an attachment</a>
+            <div id="attachments_zone"></div>
+            <input type="submit" value="Submit" class="btn"/>
+        </form>
+        <ul class="thumbnails">
+        {% for attachment in model.attachments %}
+            {% if attachment.datas_fname.split('.')[-1].upper() in ('PNG', 'JPG', 'JPEG') %}
+            <li class="span4">
+                <div>
+                    <img src="{{ resized_img_src(url_for('intranet.file', file_id=attachment.id, _external=True), width=325, height=245, mode='fit', background='white') }}" class="thumbnail" alt=""/>
+                    <h3>{{ attachment.name }}</h3>
+                    <p>
+                        <form action="{{ url_for('.attachments', id=model.id, attach_id=attachment.id, action='delete') }}" method="POST"> <button type="submit" class="btn btn-danger"><span class="icon-white icon-trash"></span> Delete</button></form>
+                        <a href="{{ url_for('intranet.file', file_id=attachment.id) }}" class="btn btn-primary"><span class="icon-white icon-download"></span> Download</a>
+                    </p>
+                </div>
+            </li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+        {% endif %}
+{% endblock %}
