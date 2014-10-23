@@ -12,15 +12,25 @@ class OpenERPModelView(BaseModelView):
             if 'relation' in desc and desc['relation']:
                 self.dynamic_choice_fields[field] = desc['relation']
 
-    def edit_form(self, obj):
-        """Updates the choices for dynamic fields.
-        """
-        form = super(OpenERPModelView, self).edit_form(obj)
+    def update_choices(self, form):
         for choice_field, relation in self.dynamic_choice_fields.items():
             relation = self.model.client.model(relation)
             remote_ids = relation.search([])
             field = getattr(form, choice_field)
             field.choices = relation.name_get(remote_ids)
+
+    def edit_form(self, obj):
+        """Updates the choices for dynamic fields.
+        """
+        form = super(OpenERPModelView, self).edit_form(obj)
+        self.update_choices(form)
+        return form
+
+    def create_form(self):
+        """Updates the choices for dynamic fields.
+        """
+        form = super(OpenERPModelView, self).create_form()
+        self.update_choices(form)
         return form
 
     def get_pk_value(self, model):
