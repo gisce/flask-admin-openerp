@@ -10,7 +10,44 @@ from .filters import *
 
 class OpenERPModelView(BaseModelView):
 
-    @expose('/attachments', methods=['GET', 'POST'])
+    def __init__(self, model, **kwargs):
+        super(OpenERPModelView, self).__init__(model, **kwargs)
+        self.dynamic_choice_fields = {}
+        for field, desc in model.fields_get().items():
+            if 'relation' in desc and desc['relation']:
+                self.dynamic_choice_fields[field] = desc['relation']
+
+    def update_choices(self, form):
+        for choice_field, relation in self.dynamic_choice_fields.items():
+            relation = self.model.client.model(relation)
+            remote_ids = relation.search([])
+            field = getattr(form, choice_field)
+            field.choices = relation.name_get(remote_ids)
+
+    def edit_form(self, obj):
+        """Updates the choices for dynamic fields.
+        """
+        form = super(OpenERPModelView, self).edit_form(obj)
+        self.update_choices(form)
+        return form
+
+    def create_form(self):
+        """Updates the choices for dynamic fields.
+        """
+        form = super(OpenERPModelView, self).create_form()
+        self.update_choices(form)
+        return form
+
+	def create_blueprint(self, admin):
+        res = super(OpenERPModelView, self).create_blueprint(admin)
+        loader = ChoiceLoader([
+            PackageLoader('flask_admin_openerp'),
+            self.blueprint.jinja_loader
+        ])
+        self.blueprint.jinja_loader = loader
+        return res
+
+	@expose('/attachments', methods=['GET', 'POST'])
     def attachments(self):
         attach_obj = self.model.client.model('ir.attachment')
         obj_id = request.args.get('id')
@@ -40,15 +77,6 @@ class OpenERPModelView(BaseModelView):
                         created += 1
                 flash("%s new attachments created" % created, "info")
         return redirect(url_for('.edit_view', id=obj_id))
-
-    def create_blueprint(self, admin):
-        res = super(OpenERPModelView, self).create_blueprint(admin)
-        loader = ChoiceLoader([
-            PackageLoader('flask_admin_openerp'),
-            self.blueprint.jinja_loader
-        ])
-        self.blueprint.jinja_loader = loader
-        return res
 
     def get_pk_value(self, model):
         return model.id
@@ -104,11 +132,22 @@ class OpenERPModelView(BaseModelView):
             res = self.model.browse(ids)
         return n_items, res
 
+    def write_data(self, origin_data, columns):
+        if origin_data != None:
+            return {key: value for key, value in origin_data.items()
+                         if key in columns}
+        else:
+            return origin_data
+
     def create_model(self, form):
-        return self.model.create(form.data)
+        data_to_write = self.write_data(form.data.items(),
+                                            self.form_create_rules)
+        return self.model.create(data_to_write)
 
     def update_model(self, form, model):
-        return model.write(form.data)
+        data_to_write = self.write_data(form.data.items(),
+                                        self.form_edit_rules)
+        return model.write(data_to_write)
 
     def delete_model(self, model):
         return model.unlink()

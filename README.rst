@@ -9,4 +9,4 @@ OpenERP Backend for Flask-Admin
     
     # You need a ERPPeek client instance in this example is c
     
-    admin.add_view(c.ResPartner, name='Partners', endpoint='partners'))
+    admin.add_view(OpenERPModelView(c.ResPartner, name='Partners', endpoint='partners'))
