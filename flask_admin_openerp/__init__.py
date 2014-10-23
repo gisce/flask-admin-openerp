@@ -38,7 +38,7 @@ class OpenERPModelView(BaseModelView):
         self.update_choices(form)
         return form
 
-	def create_blueprint(self, admin):
+    def create_blueprint(self, admin):
         res = super(OpenERPModelView, self).create_blueprint(admin)
         loader = ChoiceLoader([
             PackageLoader('flask_admin_openerp'),
@@ -47,7 +47,7 @@ class OpenERPModelView(BaseModelView):
         self.blueprint.jinja_loader = loader
         return res
 
-	@expose('/attachments', methods=['GET', 'POST'])
+    @expose('/attachments', methods=['GET', 'POST'])
     def attachments(self):
         attach_obj = self.model.client.model('ir.attachment')
         obj_id = request.args.get('id')
