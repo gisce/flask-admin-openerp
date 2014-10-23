@@ -1,6 +1,7 @@
 import base64
 
 from flask import request, abort, redirect, url_for, flash
+from jinja2.loaders import ChoiceLoader, PackageLoader
 from flask.ext.admin import expose
 from flask.ext.admin.model import BaseModelView
 from .form import Form
@@ -39,6 +40,15 @@ class OpenERPModelView(BaseModelView):
                         created += 1
                 flash("%s new attachments created" % created, "info")
         return redirect(url_for('.edit_view', id=obj_id))
+
+    def create_blueprint(self, admin):
+        res = super(OpenERPModelView, self).create_blueprint(admin)
+        loader = ChoiceLoader([
+            PackageLoader('flask_admin_openerp'),
+            self.blueprint.jinja_loader
+        ])
+        self.blueprint.jinja_loader = loader
+        return res
 
     def get_pk_value(self, model):
         return model.id
