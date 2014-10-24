@@ -34,16 +34,16 @@
         {% for attachment in attachments %}
             <li class="span4">
                 <div>
-                    {% set extension = attachment.datas_fname.split('.')[-1].upper() %}
+                    {% set extension = attachment['datas_fname'].split('.')[-1].upper() %}
                     {% if extension in ('PNG', 'JPG', 'JPEG') %}
-                    <img src="{{ resized_img_src(url_for('intranet.file', file_id=attachment.id, _external=True), width=325, height=245, mode='fit', background='white') }}" class="thumbnail" alt=""/>
+                    <img src="{{ resized_img_src(url_for('.attachment', att_id=attachment['id'], _external=True), width=325, height=245, mode='fit', background='white') }}" class="thumbnail" alt=""/>
                     {% else %}
                     <img src="http://placehold.it/325x245&text={{ extension }}"/>
                     {% endif %}
                     <h3>{{ attachment.name }}</h3>
                     <p>
-                        <form action="{{ url_for('.attachments', id=model.id, attach_id=attachment.id, action='delete') }}" method="POST"> <button type="submit" class="btn btn-danger"><span class="icon-white icon-trash"></span> Delete</button></form>
-                        <a href="{{ url_for('intranet.file', file_id=attachment.id) }}" class="btn btn-primary"><span class="icon-white icon-download"></span> Download</a>
+                        <form action="{{ url_for('.attachments', id=model.id, attach_id=attachment['id'], action='delete') }}" method="POST"> <button type="submit" class="btn btn-danger"><span class="icon-white icon-trash"></span> Delete</button></form>
+                        <a href="{{ url_for('.attachment', att_id=attachment['id']) }}" class="btn btn-primary"><span class="icon-white icon-download"></span> Download</a>
                     </p>
                 </div>
             </li>
