@@ -1,6 +1,6 @@
 import base64
 
-from flask import request, abort, redirect, url_for, flash, render_template
+from flask import request, abort, redirect, url_for, flash
 from jinja2.loaders import ChoiceLoader, PackageLoader
 from flask.ext.admin import expose
 from flask.ext.admin.model import BaseModelView
