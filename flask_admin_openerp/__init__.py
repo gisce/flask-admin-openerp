@@ -24,7 +24,7 @@ class OpenERPModelView(BaseModelView):
             relation = self.model.client.model(relation)
             remote_ids = relation.search([])
             field = getattr(form, choice_field)
-            field.choices = relation.name_get(remote_ids)
+            field.choices = [(0, '')] + relation.name_get(remote_ids)
 
     def edit_form(self, obj):
         """Updates the choices for dynamic fields.
