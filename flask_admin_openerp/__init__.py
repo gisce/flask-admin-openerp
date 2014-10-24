@@ -1,6 +1,6 @@
 import base64
 
-from flask import request, abort, redirect, url_for, flash
+from flask import request, abort, redirect, url_for, flash, render_template
 from jinja2.loaders import ChoiceLoader, PackageLoader
 from flask.ext.admin import expose
 from flask.ext.admin.model import BaseModelView
@@ -9,6 +9,8 @@ from .filters import *
 
 
 class OpenERPModelView(BaseModelView):
+
+    edit_template = 'admin_openerp/model/edit.html'
 
     def __init__(self, model, **kwargs):
         super(OpenERPModelView, self).__init__(model, **kwargs)
@@ -47,7 +49,23 @@ class OpenERPModelView(BaseModelView):
         self.blueprint.jinja_loader = loader
         return res
 
-    @expose('/attachments', methods=['GET', 'POST'])
+    def render(self, template, **kwargs):
+        attach_obj = self.model.client.model('ir.attachment')
+        model = kwargs.get('model')
+        if model:
+            search_params = [
+                ('res_id', '=', model.id),
+                ('res_model', '=', self.model._name)
+            ]
+            attach_ids = attach_obj.search(search_params)
+            if attach_ids:
+                attachments = attach_obj.browse(attach_ids)
+            else:
+                attachments = []
+            kwargs['attachments'] = attachments
+        return super(OpenERPModelView, self).render(template, **kwargs)
+
+    @expose('/attachments', methods=['POST'])
     def attachments(self):
         attach_obj = self.model.client.model('ir.attachment')
         obj_id = request.args.get('id')
@@ -76,7 +94,7 @@ class OpenERPModelView(BaseModelView):
                         })
                         created += 1
                 flash("%s new attachments created" % created, "info")
-        return redirect(url_for('.edit_view', id=obj_id))
+            return redirect(url_for('.edit_view', id=obj_id))
 
     def get_pk_value(self, model):
         return model.id
