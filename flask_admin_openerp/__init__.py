@@ -22,7 +22,8 @@ class OpenERPModelView(BaseModelView):
     def __init__(self, model, **kwargs):
         super(OpenERPModelView, self).__init__(model, **kwargs)
         self.dynamic_choice_fields = {}
-        for field, desc in model.fields_get().items():
+        fields = getattr(self, 'fields', [])
+        for field, desc in model.fields_get(fields).items():
             if 'relation' in desc and desc['relation']:
                 self.dynamic_choice_fields[field] = desc['relation']
 
