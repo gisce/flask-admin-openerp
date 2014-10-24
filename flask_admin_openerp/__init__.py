@@ -1,9 +1,16 @@
 import base64
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
-from flask import request, abort, redirect, url_for, flash
+from flask import (
+    request, abort, redirect, url_for, flash, send_file, current_app
+)
 from jinja2.loaders import ChoiceLoader, PackageLoader
 from flask.ext.admin import expose
 from flask.ext.admin.model import BaseModelView
+from itsdangerous import Signer, BadSignature
 from .form import Form
 from .filters import *
 
@@ -58,10 +65,14 @@ class OpenERPModelView(BaseModelView):
                 ('res_model', '=', self.model._name)
             ]
             attach_ids = attach_obj.search(search_params)
+            fields_to_read = ['datas_fname', 'name']
             if attach_ids:
-                attachments = attach_obj.browse(attach_ids)
+                attachments = attach_obj.read(attach_ids, fields_to_read)
             else:
                 attachments = []
+            s = Signer(current_app.config.get('SECRET_KEY'), sep='-')
+            for att in attachments:
+                att['id'] = s.sign(str(att['id']))
             kwargs['attachments'] = attachments
         return super(OpenERPModelView, self).render(template, **kwargs)
 
@@ -95,6 +106,18 @@ class OpenERPModelView(BaseModelView):
                         created += 1
                 flash("%s new attachments created" % created, "info")
             return redirect(url_for('.edit_view', id=obj_id))
+
+    @expose('/attachment/<string:att_id>')
+    def attachment(self, att_id):
+        s = Signer(current_app.config.get('SECRET_KEY'), sep='-')
+        try:
+            att_id = int(s.unsign(att_id))
+            attach_obj = self.model.client.model('ir.attachment')
+            content = attach_obj.read(att_id, ['datas'])['datas']
+            image_fp = StringIO(base64.b64decode(content))
+            return send_file(image_fp)
+        except BadSignature:
+            abort(404)
 
     def get_pk_value(self, model):
         return model.id
