@@ -175,11 +175,11 @@ class OpenERPModelView(BaseModelView):
         return n_items, res
 
     def write_data(self, origin_data, columns):
-        if origin_data is not None:
+        if columns is not None:
             return {key: value for key, value in origin_data
                          if key in columns}
         else:
-            return origin_data
+            return dict(origin_data)
 
     def create_model(self, form):
         data_to_write = self.write_data(form.data.items(),
