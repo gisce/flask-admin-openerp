@@ -143,7 +143,8 @@ class OpenERPModelView(BaseModelView):
         else:
             flt += [OpenerpEqualFilter(label, name)]
             if field_type in ('char', 'text'):
-                flt += [OpenerpLikeFilter(label, name)]
+                flt += [OpenerpLikeFilter(label, name),
+                        OpenerpILikeFilter(label, name)]
             else:
                 flt += [
                     OpenerpGreaterFilter(label, name),
