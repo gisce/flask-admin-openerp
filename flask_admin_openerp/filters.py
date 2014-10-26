@@ -16,6 +16,10 @@ class OpenERPBaseFilter(filters.BaseFilter):
 
 
 class OpenerpLikeFilter(OpenERPBaseFilter):
+    op = 'like'
+
+
+class OpenerpILikeFilter(OpenERPBaseFilter):
     op = 'ilike'
 
 

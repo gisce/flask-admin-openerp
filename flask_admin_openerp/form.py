@@ -47,6 +47,7 @@ class ListWidget(wtf_widgets.Select):
         ''']
         return wtf_widgets.HTMLString(''.join(html))
 
+
 class BinaryField(FileField):
 
     def process_formdata(self, valuelist):
@@ -59,6 +60,7 @@ class BinaryField(FileField):
 
     def _value(self):
         return base64.b64decode(self.data) if self.data is not None else ''
+
 
 MAPPING_TYPES = {
     'boolean': BooleanField,
