@@ -4,6 +4,7 @@ from wtforms import (
     TextAreaField, IntegerField, SelectField, SelectMultipleField, FileField,
     PasswordField
 )
+from wtforms import validators as wtf_validators
 from wtforms import widgets as wtf_widgets
 from erppeek import mixedcase, Record
 import base64
@@ -102,8 +103,15 @@ class Form(object):
             if override:
                 type_field = override
             kwargs = {}
+            validators = []
+            if 'required' in v and v['required']:
+                validators.append(wtf_validators.required())
+            if 'size' in v:
+                validators.append(wtf_validators.length(max=v['size']))
             if k in defaults and defaults[k] is not False:
                 kwargs['default'] = defaults[k]
+            if v.get('help'):
+                kwargs['description'] = v['help']
             if v['type'] == 'selection':
                 if v['selection'] and isinstance(v['selection'][0][0], int):
                     kwargs['coerce'] = int
