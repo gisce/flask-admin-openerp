@@ -71,7 +71,7 @@ class OpenERPModelView(BaseModelView):
                 attachments = attach_obj.read(attach_ids, fields_to_read)
             else:
                 attachments = []
-            s = Signer(current_app.config.get('SECRET_KEY'), sep='-')
+            s = Signer(current_app.config.get('SECRET_KEY'), sep='$')
             for att in attachments:
                 att['id'] = s.sign(str(att['id']))
             kwargs['attachments'] = attachments
@@ -110,7 +110,7 @@ class OpenERPModelView(BaseModelView):
 
     @expose('/attachment/<string:att_id>')
     def attachment(self, att_id):
-        s = Signer(current_app.config.get('SECRET_KEY'), sep='-')
+        s = Signer(current_app.config.get('SECRET_KEY'), sep='$')
         try:
             att_id = int(s.unsign(att_id))
             attach_obj = self.model.client.model('ir.attachment')
