@@ -88,6 +88,11 @@ class OpenERPModelView(BaseModelView):
                 attach_id = request.args.get('attach_id')
                 if not attach_id:
                     return abort(404)
+                try:
+                    s = Signer(current_app.config.get('SECRET_KEY'), sep='$')
+                    attach_id = int(s.unsign(attach_id))
+                except BadSignature:
+                    return abort(404)
                 attach_obj.unlink([attach_id])
                 flash("Attachment deleted succesfully", "info")
             else:
