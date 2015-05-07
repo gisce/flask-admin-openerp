@@ -102,8 +102,10 @@ class OpenERPModelView(BaseModelView):
                         content = base64.b64encode(value.read())
                         if not content:
                             continue
+                        name_field = 'name_'+key.split('_')[1]
+                        name = request.form.get(name_field, value.filename)
                         attach_obj.create({
-                            'name': value.filename,
+                            'name': name,
                             'datas': content,
                             'datas_fname': value.filename,
                             'res_model': self.model._name,
