@@ -2,11 +2,32 @@
 
 {% block head %}
         {{ super() }}
+        <style>
+            .attachment{
+                height: 40px;
+            }
+            .attachment input, .attachment a, .attachment label{
+                float: left;
+                display: inline-block;
+                padding: 5px;
+                margin-bottom: 0;
+                vertical-align: middle;
+            }
+            .attachment button.close{
+                color: red;
+                opacity: 1;
+            }
+        </style>
         <script type="text/javascript">
             var attachs = 0;
             function addFile() {
                 attachs += 1;
-                $("#attachments_zone").append('<div id="attachment_' + attachs + '"><input type="file" name="attachment_' + attachs + '"/><a href="javascript:removeFile(' + attachs + ')">X</a><br/></div>');
+                $("#attachments_zone").append('<div id="attachment_' + attachs + '" class="attachment">' +
+                '<a href="javascript:removeFile(' + attachs + ')"><button class="close">&times;</button></a>' +
+                ' <label for="name_' + attachs + '">Name</label> <input type="text" id=""name_' + attachs + '" name="name_' + attachs + '"/>' +
+                '<input type="file" name="attachment_' + attachs + '"/>' +
+                '</div>'
+                );
                 if (attachs > 0) {
                     $("#attach_link").html("Add another attachment");
                 }
