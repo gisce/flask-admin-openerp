@@ -4,16 +4,17 @@
         {{ super() }}
         <style>
             .attachment{
-                height: 40px;
+                line-height: 5px;
             }
             .attachment input, .attachment a, .attachment label{
                 float: left;
-                display: inline-block;
                 padding: 5px;
-                margin-bottom: 0;
-                vertical-align: middle;
             }
-            .attachment button.close{
+            .attachment input.file_hide{
+                visibility:hidden;
+                display:none;
+            }
+            .attachment .close{
                 color: red;
                 opacity: 1;
             }
