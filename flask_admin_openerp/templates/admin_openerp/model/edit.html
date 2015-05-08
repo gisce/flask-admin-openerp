@@ -24,11 +24,27 @@
             function addFile() {
                 attachs += 1;
                 $("#attachments_zone").append('<div id="attachment_' + attachs + '" class="attachment">' +
-                '<a href="javascript:removeFile(' + attachs + ')"><button class="close">&times;</button></a>' +
-                ' <label for="name_' + attachs + '">Name</label> <input type="text" id=""name_' + attachs + '" name="name_' + attachs + '"/>' +
-                '<input type="file" name="attachment_' + attachs + '"/>' +
+                '<input type="file" name="attachment_' + attachs + '" class="file_hide" id="file_' + attachs + '" /><br/>'+
+                '<div class="input-append">'+
+                '<a href="javascript:removeFile(' + attachs + ')" class="close">&times;</a>' +
+                '    <input type="text" name="name_' + attachs + '" id="name_' + attachs + '" class="input-xlarge">'+
+                '    <a class="btn" onclick="$(\'#file_' + attachs + '\').click();">Browse</a>'+
+                '</div>'+
+                '<br/>'+
                 '</div>'
                 );
+                $('#file_' + attachs ).change(function(){
+                    filename = $(this).val()
+                    last_index = filename.lastIndexOf('\\');
+                    if (last_index > 0){
+                        name = filename.substring(last_index+1)
+                    }else{
+                        name = filename
+                    }
+
+                    $('#name_' + attachs).val(name);
+                });
+
                 if (attachs > 0) {
                     $("#attach_link").html("Add another attachment");
                 }
